@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ESP Test">
+    <meta name="application-name" content="ESP Psychic Test">
+    <meta name="theme-color" content="#8a2be2">
+    <meta name="description" content="Test your extrasensory perception with Zener cards">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <title>ESP Psychic Test - Zener Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            background-image: 
+                radial-gradient(ellipse at top, rgba(75, 0, 130, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(25, 0, 51, 0.4) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background stars */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 85%, white, transparent);
+            background-size: 200% 200%;
+            animation: stars 20s linear infinite;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        @keyframes stars {
+            0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+            100% { background-position: -200% -200%, 200% 200%, -200% 200%, 200% -200%, 100% -100%, -100% 100%; }
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                0 0 100px rgba(138, 43, 226, 0.3);
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #da22ff 0%, #9733ee 50%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
+        }
+
+        .subtitle {
+            color: #b0b0e0;
+            font-size: 1em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .install-prompt {
+            display: none;
+            background: linear-gradient(145deg, #1a1a3e, #0f0f2a);
+            border: 2px solid rgba(138, 43, 226, 0.6);
+            color: #b0b0e0;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .install-prompt button {
+            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            color: #da22ff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .install-prompt button:hover {
+            border-color: rgba(138, 43, 226, 0.8);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .audio-control, .custom-cards-btn {
+            background: linear-gradient(145deg, #1a1a3e, #0f0f2a);
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            color: #b0b0e0;
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .audio-control:hover, .custom-cards-btn:hover {
+            border-color: rgba(138, 43, 226, 0.8);
+            box-shadow: 
+                0 6px 20px rgba(138, 43, 226, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #1e1e42, #151530);
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.05),
+                0 0 30px rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #8080b0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #da22ff, #9733ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #da22ff 0%, #9733ee 50%, #4facfe 100%);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+        }
+
+        /* 3D Card Display */
+        .card-display {
+            width: 280px;
+            height: 400px;
+            perspective: 1000px;
+            margin: 0 auto 30px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(138, 43, 226, 0.4);
+            border: 2px solid rgba(138, 43, 226, 0.5);
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, #1a0033, #0d001a);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(138, 43, 226, 0.3) 0%, transparent 50%);
+            color: #da22ff;
+            font-size: 140px;
+            text-shadow: 0 0 30px rgba(218, 34, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-back::before {
+            content: '?';
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .card-back::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            transform: rotateY(180deg);
+            color: #1a0033;
+            font-size: 120px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-front img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        /* Metallic Buttons */
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .choice-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                0 0 20px rgba(138, 43, 226, 0.0);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            transition: all 0.3s;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 0 40px rgba(138, 43, 226, 0.6);
+            border-color: rgba(138, 43, 226, 0.8);
+        }
+
+        .choice-btn:hover::before {
+            left: 100%;
+        }
+
+        .choice-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .choice-btn.selected {
+            background: linear-gradient(145deg, #3a2a6e, #2a1a5e);
+            border-color: #da22ff;
+            border-width: 3px;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 0 30px rgba(138, 43, 226, 0.8);
+        }
+
+        .choice-btn.correct {
+            background: linear-gradient(145deg, #1a4d2e, #0d3320);
+            border-color: #00ff88;
+            animation: correctFlash 0.6s ease;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(0, 255, 136, 0.8);
+        }
+
+        .choice-btn.incorrect {
+            background: linear-gradient(145deg, #4d1a1a, #331010);
+            border-color: #ff4444;
+            animation: shake 0.5s ease;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(255, 68, 68, 0.8);
+        }
+
+        @keyframes correctFlash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px) rotate(-5deg); }
+            75% { transform: translateX(8px) rotate(5deg); }
+        }
+
+        .choice-symbol {
+            font-size: 2.5em;
+            color: #b0b0e0;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            transition: all 0.3s;
+        }
+
+        .choice-btn img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .choice-btn:hover .choice-symbol {
+            color: #da22ff;
+            filter: drop-shadow(0 0 10px rgba(218, 34, 255, 0.8));
+        }
+
+        .choice-btn.selected .choice-symbol {
+            color: #da22ff;
+        }
+
+        .choice-btn.correct .choice-symbol {
+            color: #00ff88;
+        }
+
+        .choice-btn.incorrect .choice-symbol {
+            color: #ff4444;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.15em;
+            font-weight: bold;
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
+            color: #da22ff;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(138, 43, 226, 0.3);
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 0 50px rgba(138, 43, 226, 0.6);
+            transform: translateY(-2px);
+            border-color: rgba(138, 43, 226, 0.8);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(145deg, #4e2a4e, #3e1a3e);
+            color: #ff88ff;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(255, 100, 255, 0.3);
+        }
+
+        .action-btn.secondary:hover {
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 0 50px rgba(255, 100, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            display: none;
+            animation: slideIn 0.5s ease;
+            border: 2px solid;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-message.correct {
+            background: linear-gradient(145deg, rgba(26, 77, 46, 0.8), rgba(13, 51, 32, 0.8));
+            color: #00ff88;
+            border-color: #00ff88;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+        }
+
+        .result-message.incorrect {
+            background: linear-gradient(145deg, rgba(77, 26, 26, 0.8), rgba(51, 16, 16, 0.8));
+            color: #ff4444;
+            border-color: #ff4444;
+            box-shadow: 0 0 40px rgba(255, 68, 68, 0.4);
+        }
+
+        /* History Section */
+        .history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: linear-gradient(145deg, #1e1e42, #151530);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-title {
+            color: #8080b0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 8px;
+            font-size: 0.95em;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        .history-item.correct {
+            border-color: rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .history-item.incorrect {
+            border-color: rgba(255, 68, 68, 0.3);
+            background: rgba(255, 68, 68, 0.05);
+        }
+
+        .history-item span {
+            color: #b0b0e0;
+        }
+
+        .history-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .history-item.correct .history-icon {
+            color: #00ff88;
+        }
+
+        .history-item.incorrect .history-icon {
+            color: #ff4444;
+        }
+
+        /* Final Results */
+        .final-results {
+            display: none;
+            text-align: center;
+        }
+
+        .final-results h2 {
+            color: #da22ff;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(218, 34, 255, 0.6);
+        }
+
+        .final-score {
+            font-size: 3.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #da22ff, #9733ee, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 30px rgba(138, 43, 226, 0.6));
+        }
+
+        .interpretation {
+            background: linear-gradient(145deg, #1e1e42, #151530);
+            padding: 25px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.3);
+        }
+
+        .interpretation h3 {
+            color: #da22ff;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            text-shadow: 0 0 15px rgba(218, 34, 255, 0.5);
+        }
+
+        .interpretation p {
+            color: #b0b0e0;
+            line-height: 1.6;
+        }
+
+        /* Custom Cards Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1e1e42, #151530);
+            margin: 5% auto;
+            padding: 30px;
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #da22ff;
+            font-size: 1.8em;
+        }
+
+        .close {
+            color: #b0b0e0;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            color: #da22ff;
+            transform: rotate(90deg);
+        }
+
+        .upload-section {
+            margin-bottom: 25px;
+        }
+
+        .upload-item {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .upload-item label {
+            color: #b0b0e0;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .upload-item input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 8px;
+            color: #b0b0e0;
+            cursor: pointer;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .preview-card {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #2a2a4e, #1a1a3e);
+            border: 2px solid rgba(138, 43, 226, 0.4);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .preview-card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-card .placeholder {
+            color: #8080b0;
+            font-size: 3em;
+        }
+
+        /* Scrollbar styling */
+        .history::-webkit-scrollbar, .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history::-webkit-scrollbar-track, .modal-content::-webkit-scrollbar-track {
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+        }
+
+        .history::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(138, 43, 226, 0.5);
+            border-radius: 10px;
+        }
+
+        .history::-webkit-scrollbar-thumb:hover, .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(138, 43, 226, 0.7);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .card-display {
+                width: 220px;
+                height: 320px;
+            }
+
+            .choices {
+                gap: 8px;
+            }
+
+            .choice-symbol {
+                font-size: 2em;
+            }
+
+            .final-score {
+                font-size: 2.5em;
+            }
+
+            .preview-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <p>📱 Install this app on your device for the best experience!</p>
+        <button id="installBtn">Install App</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🔮 ESP Psychic Test</h1>
+            <p class="subtitle">Test your extrasensory perception with Zener cards</p>
+        </header>
+
+        <div class="controls-row">
+            <button class="audio-control" id="audioToggle">🔊 Music: ON</button>
+            <button class="custom-cards-btn" id="customCardsBtn">📤 Custom Cards</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Round</div>
+                <div class="stat-value" id="currentRound">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value" id="correctCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Accuracy</div>
+                <div class="stat-value" id="accuracy">0%</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="testArea">
+            <div class="card-display">
+                <div class="card" id="card">
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front" id="cardFront"></div>
+                </div>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+
+            <div class="choices" id="choices"></div>
+
+            <button class="action-btn primary" id="submitBtn" disabled>
+                <span>Make Your Prediction</span>
+            </button>
+            <button class="action-btn secondary" id="nextBtn" style="display: none;">
+                <span>Next Card</span>
+            </button>
+
+            <div class="history" id="historyContainer" style="display: none;">
+                <div class="history-title">Recent History</div>
+                <div id="history"></div>
+            </div>
+        </div>
+
+        <div class="final-results" id="finalResults">
+            <h2>✨ Test Complete! ✨</h2>
+            <div class="final-score" id="finalScore"></div>
+            <div class="interpretation" id="interpretation"></div>
+            <button class="action-btn primary" onclick="location.reload()">
+                <span>Start New Test</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Cards Modal -->
+    <div id="customCardsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Custom Cards</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <p style="color: #b0b0e0; margin-bottom: 20px;">Upload 5 images to use as your custom Zener cards. Images will be used in order.</p>
+            
+            <div class="upload-section">
+                <div class="upload-item">
+                    <label>Card 1</label>
+                    <input type="file" accept="image/*" id="card1" onchange="previewCard(0, this)">
+                </div>
+                <div class="upload-item">
+                    <label>Card 2</label>
+                    <input type="file" accept="image/*" id="card2" onchange="previewCard(1, this)">
+                </div>
+                <div class="upload-item">
+                    <label>Card 3</label>
+                    <input type="file" accept="image/*" id="card3" onchange="previewCard(2, this)">
+                </div>
+                <div class="upload-item">
+                    <label>Card 4</label>
+                    <input type="file" accept="image/*" id="card4" onchange="previewCard(3, this)">
+                </div>
+                <div class="upload-item">
+                    <label>Card 5</label>
+                    <input type="file" accept="image/*" id="card5" onchange="previewCard(4, this)">
+                </div>
+            </div>
+
+            <div class="preview-grid" id="previewGrid">
+                <div class="preview-card"><div class="placeholder">1</div></div>
+                <div class="preview-card"><div class="placeholder">2</div></div>
+                <div class="preview-card"><div class="placeholder">3</div></div>
+                <div class="preview-card"><div class="placeholder">4</div></div>
+                <div class="preview-card"><div class="placeholder">5</div></div>
+            </div>
+
+            <button class="action-btn primary" style="margin-top: 20px;" onclick="applyCustomCards()">
+                <span>Apply Custom Cards</span>
+            </button>
+            <button class="action-btn secondary" onclick="resetToDefault()">
+                <span>Reset to Default</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response: ${outcome}`);
+                deferredPrompt = null;
+                installPrompt.style.display = 'none';
+            }
+        });
+
+        // Hide install prompt after installation
+        window.addEventListener('appinstalled', () => {
+            installPrompt.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // [REST OF THE JAVASCRIPT CODE FROM PREVIOUS VERSION - EXACT SAME]
+        // Advanced Monte Carlo RNG with entropy
+        class EnhancedRNG {
+            constructor() {
+                this.entropy = this.gatherEntropy();
+                this.seed = Date.now();
+            }
+
+            gatherEntropy() {
+                const sources = [
+                    Date.now(),
+                    performance.now(),
+                    Math.random() * 1000000,
+                    window.innerWidth * window.innerHeight,
+                    navigator.hardwareConcurrency || 1,
+                    (new Date()).getTimezoneOffset(),
+                    window.devicePixelRatio || 1
+                ];
+                
+                if (window.mouseEntropy) {
+                    sources.push(...window.mouseEntropy);
+                }
+                
+                return sources.reduce((acc, val) => acc + val, 0);
+            }
+
+            next() {
+                const crypto = window.crypto || window.msCrypto;
+                let random;
+                
+                if (crypto && crypto.getRandomValues) {
+                    const array = new Uint32Array(1);
+                    crypto.getRandomValues(array);
+                    random = array[0] / (0xffffffff + 1);
+                } else {
+                    random = Math.random();
+                }
+                
+                this.entropy = (this.entropy * 1103515245 + 12345 + Date.now() + performance.now()) % 2147483648;
+                this.seed = (this.seed * 9301 + 49297) % 233280;
+                
+                const mixed = (random + (this.entropy / 2147483648) + (this.seed / 233280)) / 3;
+                return mixed;
+            }
+
+            nextInt(min, max) {
+                return Math.floor(this.next() * (max - min + 1)) + min;
+            }
+
+            shuffle(array) {
+                const arr = [...array];
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = this.nextInt(0, i);
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+        }
+
+        // Mouse entropy collection
+        window.mouseEntropy = [];
+        document.addEventListener('mousemove', (e) => {
+            if (window.mouseEntropy.length < 100) {
+                window.mouseEntropy.push(e.clientX * e.clientY * Date.now());
+            }
+        });
+
+        // iOS-compatible Audio System
+        let audioContext;
+        let musicEnabled = true;
+        let audioInitialized = false;
+        let backgroundMusicInterval;
+
+        function initAudio() {
+            if (!audioInitialized) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioInitialized = true;
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                }
+            }
+        }
+
+        function resumeAudioContext() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function createBackgroundMusic() {
+            if (!musicEnabled || !audioContext) return;
+            
+            resumeAudioContext();
+            const now = audioContext.currentTime;
+            
+            const drone = audioContext.createOscillator();
+            const droneGain = audioContext.createGain();
+            drone.connect(droneGain);
+            droneGain.connect(audioContext.destination);
+            drone.frequency.value = 55;
+            drone.type = 'sine';
+            droneGain.gain.setValueAtTime(0.05, now);
+            droneGain.gain.linearRampToValueAtTime(0.08, now + 2);
+            
+            const high = audioContext.createOscillator();
+            const highGain = audioContext.createGain();
+            high.connect(highGain);
+            highGain.connect(audioContext.destination);
+            high.frequency.value = 880 + Math.random() * 220;
+            high.type = 'sine';
+            highGain.gain.setValueAtTime(0, now);
+            highGain.gain.linearRampToValueAtTime(0.02, now + 1);
+            highGain.gain.linearRampToValueAtTime(0, now + 4);
+            
+            drone.start(now);
+            high.start(now);
+            
+            drone.stop(now + 8);
+            high.stop(now + 5);
+        }
+
+        function startBackgroundMusic() {
+            if (backgroundMusicInterval) {
+                clearInterval(backgroundMusicInterval);
+            }
+            backgroundMusicInterval = setInterval(() => {
+                if (musicEnabled && !game.testEnded) {
+                    createBackgroundMusic();
+                }
+            }, 8000);
+            createBackgroundMusic();
+        }
+
+        function stopBackgroundMusic() {
+            if (backgroundMusicInterval) {
+                clearInterval(backgroundMusicInterval);
+                backgroundMusicInterval = null;
+            }
+        }
+
+        function playSound(type) {
+            if (!audioContext) return;
+            
+            resumeAudioContext();
+            const now = audioContext.currentTime;
+            
+            switch(type) {
+                case 'select':
+                    const sel = audioContext.createOscillator();
+                    const selGain = audioContext.createGain();
+                    sel.connect(selGain);
+                    selGain.connect(audioContext.destination);
+                    sel.frequency.value = 800;
+                    sel.type = 'sine';
+                    selGain.gain.setValueAtTime(0.1, now);
+                    selGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    sel.start(now);
+                    sel.stop(now + 0.2);
+                    break;
+                    
+                case 'correct':
+                    [1200, 1400, 1600, 1800].forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'sine';
+                        const startTime = now + (i * 0.1);
+                        gain.gain.setValueAtTime(0.15, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.4);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.4);
+                    });
+                    break;
+                    
+                case 'incorrect':
+                    [400, 350, 300].forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'sawtooth';
+                        const startTime = now + (i * 0.15);
+                        gain.gain.setValueAtTime(0.1, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.3);
+                    });
+                    break;
+                    
+                case 'start':
+                    [600, 800, 1000, 1200, 1400].forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'sine';
+                        const startTime = now + (i * 0.15);
+                        gain.gain.setValueAtTime(0.12, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.3);
+                    });
+                    setTimeout(startBackgroundMusic, 1000);
+                    break;
+                    
+                case 'complete':
+                    [800, 1000, 1200, 1400, 1600, 1800].forEach((freq, i) => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'sine';
+                        const startTime = now + (i * 0.12);
+                        gain.gain.setValueAtTime(0.15, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.5);
+                    });
+                    break;
+                    
+                case 'flip':
+                    const flip = audioContext.createOscillator();
+                    const flipGain = audioContext.createGain();
+                    flip.connect(flipGain);
+                    flipGain.connect(audioContext.destination);
+                    flip.frequency.setValueAtTime(400, now);
+                    flip.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+                    flip.type = 'square';
+                    flipGain.gain.setValueAtTime(0.08, now);
+                    flipGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    flip.start(now);
+                    flip.stop(now + 0.15);
+                    break;
+            }
+        }
+
+        const defaultSymbols = {
+            circle: { name: 'Circle', char: '○', image: null },
+            cross: { name: 'Cross', char: '+', image: null },
+            waves: { name: 'Waves', char: '≈', image: null },
+            square: { name: 'Square', char: '□', image: null },
+            star: { name: 'Star', char: '★', image: null }
+        };
+
+        let symbols = {...defaultSymbols};
+        let customImages = [null, null, null, null, null];
+
+        const game = {
+            rng: new EnhancedRNG(),
+            totalRounds: 25,
+            currentRound: 0,
+            correctGuesses: 0,
+            selectedChoice: null,
+            history: [],
+            deck: [],
+            testEnded: false
+        };
+
+        function previewCard(index, input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    customImages[index] = e.target.result;
+                    const previewCards = document.querySelectorAll('.preview-card');
+                    previewCards[index].innerHTML = `<img src="${e.target.result}" alt="Card ${index + 1}">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyCustomCards() {
+            const allImagesLoaded = customImages.every(img => img !== null);
+            if (!allImagesLoaded) {
+                alert('Please upload all 5 card images before applying.');
+                return;
+            }
+
+            const keys = Object.keys(symbols);
+            keys.forEach((key, index) => {
+                symbols[key].image = customImages[index];
+            });
+
+            document.getElementById('customCardsModal').style.display = 'none';
+            location.reload();
+        }
+
+        function resetToDefault() {
+            symbols = {...defaultSymbols};
+            customImages = [null, null, null, null, null];
+            
+            const previewCards = document.querySelectorAll('.preview-card');
+            previewCards.forEach((card, index) => {
+                card.innerHTML = `<div class="placeholder">${index + 1}</div>`;
+            });
+            
+            document.querySelectorAll('input[type="file"]').forEach(input => {
+                input.value = '';
+            });
+        }
+
+        document.getElementById('customCardsBtn').onclick = function() {
+            document.getElementById('customCardsModal').style.display = 'block';
+        };
+
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('customCardsModal').style.display = 'none';
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('customCardsModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function initGame() {
+            initAudio();
+            
+            game.deck = [];
+            Object.keys(symbols).forEach(key => {
+                for (let i = 0; i < 5; i++) {
+                    game.deck.push(key);
+                }
+            });
+            
+            game.deck = game.rng.shuffle(game.deck);
+            
+            initChoices();
+            updateStats();
+            
+            setTimeout(startTest, 500);
+        }
+
+        function initChoices() {
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+            
+            Object.keys(symbols).forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                
+                if (symbols[key].image) {
+                    btn.innerHTML = `<img src="${symbols[key].image}" alt="${symbols[key].name}">`;
+                } else {
+                    btn.innerHTML = `<div class="choice-symbol">${symbols[key].char}</div>`;
+                }
+                
+                btn.onclick = () => selectChoice(key, btn);
+                btn.dataset.symbol = key;
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        function selectChoice(symbol, btn) {
+            initAudio();
+            playSound('select');
+            
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            game.selectedChoice = symbol;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function startTest() {
+            initAudio();
+            playSound('start');
+            game.testEnded = false;
+            document.getElementById('historyContainer').style.display = 'block';
+        }
+
+        function submitGuess() {
+            if (!game.selectedChoice || game.deck.length === 0) return;
+            
+            const actualCard = game.deck.pop();
+            const isCorrect = game.selectedChoice === actualCard;
+            
+            game.currentRound++;
+            if (isCorrect) game.correctGuesses++;
+            
+            game.history.unshift({
+                round: game.currentRound,
+                guess: game.selectedChoice,
+                actual: actualCard,
+                correct: isCorrect
+            });
+            
+            revealCard(actualCard, isCorrect);
+            updateStats();
+            updateHistory();
+            
+            document.getElementById('submitBtn').style.display = 'none';
+            
+            if (game.deck.length > 0) {
+                setTimeout(() => {
+                    document.getElementById('nextBtn').style.display = 'block';
+                }, 2000);
+            } else {
+                setTimeout(showFinalResults, 2500);
+            }
+        }
+
+        function revealCard(actualCard, isCorrect) {
+            playSound('flip');
+            setTimeout(() => playSound(isCorrect ? 'correct' : 'incorrect'), 400);
+            
+            const card = document.getElementById('card');
+            const cardFront = document.getElementById('cardFront');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (symbols[actualCard].image) {
+                cardFront.innerHTML = `<img src="${symbols[actualCard].image}" alt="${symbols[actualCard].name}">`;
+            } else {
+                cardFront.textContent = symbols[actualCard].char;
+            }
+            
+            card.classList.add('flipped');
+            
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                if (btn.dataset.symbol === actualCard) {
+                    btn.classList.add('correct');
+                } else if (btn.dataset.symbol === game.selectedChoice && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+                btn.style.pointerEvents = 'none';
+            });
+            
+            resultMessage.className = 'result-message ' + (isCorrect ? 'correct' : 'incorrect');
+            resultMessage.textContent = isCorrect 
+                ? '✨ Correct! Your psychic powers are strong!' 
+                : `❌ The card was ${symbols[actualCard].name}`;
+            resultMessage.style.display = 'block';
+        }
+
+        function nextCard() {
+            const card = document.getElementById('card');
+            card.classList.remove('flipped');
+            
+            document.getElementById('resultMessage').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+                btn.style.pointerEvents = 'auto';
+            });
+            
+            game.selectedChoice = null;
+        }
+
+        function updateStats() {
+            document.getElementById('currentRound').textContent = game.currentRound;
+            document.getElementById('correctCount').textContent = game.correctGuesses;
+            
+            const accuracy = game.currentRound > 0 
+                ? Math.round((game.correctGuesses / game.currentRound) * 100)
+                : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            const progress = (game.currentRound / game.totalRounds) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateHistory() {
+            const historyContainer = document.getElementById('history');
+            historyContainer.innerHTML = '';
+            
+            game.history.slice(0, 10).forEach(item => {
+                const div = document.createElement('div');
+                div.className = `history-item ${item.correct ? 'correct' : 'incorrect'}`;
+                
+                const guessDisplay = symbols[item.guess].image ? '🖼️' : symbols[item.guess].char;
+                const actualDisplay = symbols[item.actual].image ? '🖼️' : symbols[item.actual].char;
+                
+                div.innerHTML = `
+                    <span>Round ${item.round}</span>
+                    <span>You: ${guessDisplay} | Card: ${actualDisplay}</span>
+                    <span class="history-icon">${item.correct ? '✓' : '✗'}</span>
+                `;
+                historyContainer.appendChild(div);
+            });
+        }
+
+        function showFinalResults() {
+            playSound('complete');
+            game.testEnded = true;
+            stopBackgroundMusic();
+            
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('finalResults').style.display = 'block';
+            
+            const percentage = Math.round((game.correctGuesses / game.totalRounds) * 100);
+            document.getElementById('finalScore').textContent = `${game.correctGuesses}/${game.totalRounds} (${percentage}%)`;
+            
+            let interpretation = '';
+            if (percentage >= 40) {
+                interpretation = '<h3>🌟 Exceptional Psychic Ability!</h3><p>Your score significantly exceeds chance (20%). You have demonstrated remarkable extrasensory perception! Your intuitive abilities are truly extraordinary.</p>';
+            } else if (percentage >= 30) {
+                interpretation = '<h3>✨ Strong Intuition</h3><p>Your score is notably above average, suggesting genuine intuitive abilities. You have a natural connection to the unseen realms!</p>';
+            } else if (percentage >= 20) {
+                interpretation = '<h3>🎯 Average Psychic Ability</h3><p>Your score is around the expected chance level (20%). This is typical for most people. Practice may enhance your abilities!</p>';
+            } else {
+                interpretation = '<h3>🤔 Below Chance</h3><p>Your score is below random chance. Sometimes overthinking can block intuitive insights. Try to trust your first instinct!</p>';
+            }
+            
+            document.getElementById('interpretation').innerHTML = interpretation;
+        }
+
+        document.getElementById('audioToggle').onclick = function() {
+            initAudio();
+            musicEnabled = !musicEnabled;
+            this.textContent = musicEnabled ? '🔊 Music: ON' : '🔇 Music: OFF';
+            if (musicEnabled && !game.testEnded) {
+                startBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+        };
+
+        document.getElementById('submitBtn').onclick = submitGuess;
+        document.getElementById('nextBtn').onclick = nextCard;
+        
+        window.addEventListener('load', initGame);
+        
+        document.addEventListener('touchstart', function() {
+            initAudio();
+            resumeAudioContext();
+        }, { once: true });
+    </script>
+</body>
+</html>

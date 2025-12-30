@@ -15,8 +15,10 @@
   :root {
     --bg-dark: #080808;
     --text-main: #e0e0e0;
-    --accent: #00D4FF; /* Cyan for PSI Engine */
+    --accent: #00D4FF;
     --border: #333;
+    --hit: #00FF00;
+    --miss: #FF0055;
   }
 
   body {
@@ -34,7 +36,7 @@
     padding: 20px;
   }
 
-  /* Deep Space Atmosphere */
+  /* Atmosphere */
   .bg-glow {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -43,10 +45,8 @@
     pointer-events: none;
   }
 
-  /* Header Branding */
-  .header {
-    margin-bottom: 40px;
-  }
+  /* Header */
+  .header { margin-bottom: 20px; }
   
   h1 {
     font-family: 'Cinzel', serif;
@@ -55,7 +55,6 @@
     letter-spacing: 4px;
     margin: 0;
     color: #fff;
-    text-transform: uppercase;
     text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   }
 
@@ -68,17 +67,21 @@
     opacity: 0.8;
   }
 
-  /* Card Display Area */
+  /* Card Display */
+  .card-container {
+    margin-bottom: 30px;
+    position: relative;
+  }
+
   .card-stage {
     width: 220px;
     height: 320px;
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
-    border-radius: 4px; /* Sharper corners like the book site */
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 40px;
     font-size: 5rem;
     color: #444;
     position: relative;
@@ -95,6 +98,16 @@
     transform: translateY(-5px);
   }
 
+  /* Result Text */
+  .result-message {
+    margin-top: 15px;
+    height: 20px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+  }
+
   /* Controls */
   .controls {
     display: flex;
@@ -102,7 +115,7 @@
     justify-content: center;
     flex-wrap: wrap;
     max-width: 600px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
   }
 
   button.guess-btn {
@@ -119,14 +132,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
 
   button.guess-btn:hover {
     border-color: var(--accent);
     color: #fff;
     background: rgba(0, 212, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
     transform: scale(1.1);
+  }
+  
+  button.guess-btn:active {
+    transform: scale(0.95);
   }
 
   /* Stats Panel */
@@ -156,7 +174,7 @@
 
   /* Return Button */
   .return-btn {
-    margin-top: 60px;
+    margin-top: 50px;
     text-decoration: none;
     color: #555;
     font-size: 0.75rem;
@@ -185,7 +203,10 @@
   <div class="subtitle">Zener Coincidence Engine</div>
 </div>
 
-<div class="card-stage" id="mainCard">?</div>
+<div class="card-container">
+  <div class="card-stage" id="mainCard">?</div>
+  <div class="result-message" id="feedback"></div>
+</div>
 
 <div class="controls">
   <button class="guess-btn" onclick="guess('CIRCLE')" title="Circle">○</button>
@@ -215,11 +236,51 @@
 </a>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('Service Worker Registered', reg))
-      .catch(err => console.log('Service Worker Error', err));
-  }
+  const AudioEngine = {
+    ctx: null,
+    
+    init: function() {
+      if (!this.ctx) {
+        // Create audio context on first interaction
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    },
+
+    playTone: function(freq, type, duration) {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      
+      // Volume Envelope (Fade out)
+      gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    },
+
+    playHit: function() {
+      // High pitched 'Sonar' ping (Sine wave)
+      this.playTone(880, 'sine', 0.6); 
+      // Add a slight harmonic
+      setTimeout(() => this.playTone(1760, 'sine', 0.3), 50);
+    },
+
+    playMiss: function() {
+      // Low pitched 'Thud' (Triangle wave)
+      this.playTone(150, 'triangle', 0.4);
+      // Pitch drop effect
+      setTimeout(() => this.playTone(100, 'triangle', 0.3), 50);
+    }
+  };
 </script>
 
 <script>
@@ -241,39 +302,64 @@
     if (isProcessing) return; 
     isProcessing = true;
 
-    // Logic
+    // Initialize Audio Context on first click
+    AudioEngine.init();
+
     const target = symbols[Math.floor(Math.random() * symbols.length)];
     const cardElement = document.getElementById('mainCard');
+    const feedbackElement = document.getElementById('feedback');
     
-    // Reveal
+    // REVEAL
     cardElement.innerHTML = displayMap[target];
     cardElement.classList.add('revealed');
 
-    // Stats Logic
+    // LOGIC
     total++;
     if (userChoice === target) {
       hits++;
-      cardElement.style.borderColor = '#00FF00'; // Green Flash for Hit
+      // HIT VISUALS
+      cardElement.style.borderColor = 'var(--hit)';
       cardElement.style.boxShadow = '0 0 60px rgba(0, 255, 0, 0.3)';
+      cardElement.style.color = 'var(--hit)';
+      feedbackElement.innerHTML = `<span style="color:var(--hit)">MATCH CONFIRMED</span>`;
+      
+      // HIT SOUND
+      AudioEngine.playHit();
+      
     } else {
       misses++;
-      cardElement.style.borderColor = '#FF0055'; // Red Flash for Miss
+      // MISS VISUALS
+      cardElement.style.borderColor = 'var(--miss)';
       cardElement.style.boxShadow = '0 0 60px rgba(255, 0, 85, 0.3)';
+      cardElement.style.color = '#fff'; 
+      feedbackElement.innerHTML = `YOU CHOSE <span style="color:#888">${userChoice}</span> // TARGET WAS <span style="color:#fff">${target}</span>`;
+      
+      // MISS SOUND
+      AudioEngine.playMiss();
     }
 
-    // Update Text
+    // UPDATE STATS
     document.getElementById('hits').innerText = hits;
     document.getElementById('misses').innerText = misses;
     document.getElementById('total').innerText = total;
 
-    // Reset
+    // RESET
     setTimeout(() => {
       cardElement.classList.remove('revealed');
       cardElement.style.borderColor = ''; 
       cardElement.style.boxShadow = '';
+      cardElement.style.color = '#444'; 
       cardElement.innerHTML = '?';
+      feedbackElement.innerHTML = ''; 
       isProcessing = false;
-    }, 1200);
+    }, 1500);
+  }
+
+  // Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service Worker Registered'))
+      .catch(err => console.log('Service Worker Error', err));
   }
 </script>
 
